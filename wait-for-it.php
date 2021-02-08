@@ -111,34 +111,39 @@ if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
 
     if ($arguments) {
         if ($result || ! $strict) {
-            $path     = array_shift($arguments);
-            $realpath = realpath($path);
-
-            if (! $realpath) {
-                $realpath = realpath(shell_exec('which ' . escapeshellarg($path)));
-            }
-
-            if (! $realpath) {
-                array_unshift($arguments, $path);
-
-                $path     = shell_exec('which sh');
-                $realpath = realpath($path);
-
-                if (! $realpath) {
-                    $path     = '/bin/sh';
-                    $realpath = realpath($path) ?: $path;
-                }
-
-                $arguments = ['-c', implode(' ', $arguments)];
-            }
-
-            pcntl_exec($realpath, $arguments, getenv());
+            $path = array_shift($arguments);
+            wait_for_it_exec($path, $arguments);
         } else {
             wait_for_it_echoerr("{$argv[0]}: strict mode, refusing to execute subprocess");
         }
     }
 
     exit($result ? 0 : 1);
+}
+
+/**
+ * @param  string    $path
+ * @param  string[]  $arguments
+ * @return void
+ */
+function wait_for_it_exec(string $path, array $arguments)
+{
+    $realpath = realpath($path);
+
+    if (! $realpath) {
+        $realpath = realpath(shell_exec('which ' . escapeshellarg($path)));
+    }
+
+    if (! $realpath) {
+        $realpath = realpath(shell_exec('which sh'));
+        if (! $realpath) {
+            $realpath = '/bin/sh';
+        }
+
+        $arguments = ['-c', escapeshellcmd($path) . ' ' . implode(' ', array_map('escapeshellarg', $arguments))];
+    }
+
+    pcntl_exec($realpath, $arguments, getenv());
 }
 
 /**
@@ -189,8 +194,8 @@ USAGE;
 /**
  * Waits for the given $address to become available, or until $timeout seconds go by, whichever comes first.
  *
- * @param  string      $address      Host address to try and connect to. In the standard URL format `transport://target`.
- *                                   So in reality this can be any PHP stream.
+ * @param  string  $address          Host address to try and connect to. In the standard URL format
+ *                                   `transport://target`. So in reality this can be any PHP stream.
  * @param  int         $timeout      Number of seconds to wait for the host to become available.
  * @param  float|null  $time_waited  If set, will be filled with time waited for the host to become available.
  * @return bool True if successfully connected, false otherwise.
