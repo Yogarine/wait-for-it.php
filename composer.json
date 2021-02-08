@@ -1,0 +1,21 @@
+{
+    "name": "yogarine/wait-for-it.php",
+    "description": "A PHP implementation of Giles Hall's wait-for-it.sh script.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alwin Garside",
+            "email": "alwin@garsi.de"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "files": ["wait-for-it.php"]
+    },
+    "bin": ["wait-for-it.php"],
+    "require": {
+        "php": ">=7.0",
+        "ext-pcntl": "*"
+    }
+}
