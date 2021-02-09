@@ -11,9 +11,9 @@
     ],
     "minimum-stability": "stable",
     "autoload": {
-        "files": ["helper.php"]
+        "files": ["src/wait-for-it.php"]
     },
-    "bin": ["wait-for-it.php"],
+    "bin": ["bin/wait-for-it"],
     "require": {
         "php": ">=7.0",
         "ext-pcntl": "*"

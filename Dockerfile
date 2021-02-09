@@ -7,6 +7,7 @@ RUN apt-get --yes --quiet update \
  && apt-get clean --yes --quiet \
  && rm --recursive --force /var/lib/apt/lists/*
 
-COPY ["wait-for-it.php", "/usr/local/bin/wait-for-it.php"]
+COPY ["bin/wait-for-it",     "/usr/local/bin/wait-for-it"]
+COPY ["src/wait-for-it.php", "/usr/share/php/wait-for-it.php"]
 
-ENTRYPOINT ["/usr/local/bin/wait-for-it.php"]
+ENTRYPOINT ["/usr/local/bin/wait-for-it"]

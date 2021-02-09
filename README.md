@@ -44,7 +44,7 @@ You can also install wait-for-it.php as a dependency of your project:
 composer require yogarine/wait-for-it
 ```
 
-This will allow you to use the `wait`
+This will allow you to use the `wait_for_it()` function.
 
 
 ### Docker
@@ -57,7 +57,7 @@ docker run yogarine/wait-for-it www.google.com:80 -- echo "google is up"
 You can also easily copy the script in your own Dockerfiles:
 ```dockerfile
 # Copy wait-for-it.php from it's official Docker image.
-COPY --from=yogarine/wait-for-it /usr/local/bin/wait-for-it.php /usr/local/bin/
+COPY --from=yogarine/wait-for-it /usr/local/bin/wait-for-it /usr/local/bin/
 ```
 Just keep in mind you'll need to have the pcntl extension installed.
 
@@ -67,7 +67,7 @@ Just keep in mind you'll need to have the pcntl extension installed.
 When installed as composer package `wait-for-it.php` is automatically included
 as helper file, and declares the `wait_for_it()` function.
 
-It will wait and return `true` 
+It will wait and return `true` if the host came up, and false otherwise.
 
 
 ## Examples
@@ -76,9 +76,9 @@ For example, let's test to see if we can access port 80 on `www.google.com`,
 and if it is available, echo the message `google is up`.
 
 ```bash
-$ ./wait-for-it.php www.google.com:80 -- echo "google is up"
-wait-for-it.php: waiting 15 seconds for www.google.com:80
-wait-for-it.php: www.google.com:80 is available after 0 seconds
+$ vendor/bin/wait-for-it -t 0 www.google.com:80 -- echo "google is up" www.google.com:80 -- echo "google is up"
+wait-for-it: waiting 15 seconds for www.google.com:80
+wait-for-it: www.google.com:80 is available after 0 seconds
 google is up
 ```
 
@@ -86,9 +86,9 @@ You can set your own timeout with the `-t` or `--timeout=` option.  Setting
 the timeout value to 0 will disable the timeout:
 
 ```bash
-$ ./wait-for-it.php -t 0 www.google.com:80 -- echo "google is up"
-wait-for-it.php: waiting for www.google.com:80 without a timeout
-wait-for-it.php: www.google.com:80 is available after 0 seconds
+$ vendor/bin/wait-for-it -t 0 www.google.com:80 -- echo "google is up"
+wait-for-it: waiting for www.google.com:80 without a timeout
+wait-for-it: www.google.com:80 is available after 0 seconds
 google is up
 ```
 
@@ -98,29 +98,25 @@ argument. In this example, we will test port 81 on `www.google.com` which will
 fail:
 
 ```bash
-$ ./wait-for-it.php www.google.com:81 --timeout=1 --strict -- echo "google is up"
-wait-for-it.php: waiting 1 seconds for www.google.com:81
-wait-for-it.php: timeout occurred after waiting 1 seconds for www.google.com:81
-wait-for-it.php: strict mode, refusing to execute subprocess
+$ vendor/bin/wait-for-it www.google.com:81 --timeout=1 --strict -- echo "google is up"
+wait-for-it: waiting 1 seconds for www.google.com:81
+wait-for-it: timeout occurred after waiting 1 seconds for www.google.com:81
+wait-for-it: strict mode, refusing to execute subprocess
 ```
 
 If you don't want to execute a subcommand, leave off the `--` argument.  This
-way, you can test the exit condition of `wait-for-it.sh` in your own scripts,
+way, you can test the exit condition of `wait-for-it.php` in your own scripts,
 and determine how to proceed:
 
 ```bash
-$ ./wait-for-it.sh www.google.com:80
-wait-for-it.php: waiting 15 seconds for www.google.com:80
-wait-for-it.php: www.google.com:80 is available after 0 seconds
+$ vendor/bin/wait-for-it www.google.com:80
+wait-for-it: waiting 15 seconds for www.google.com:80
+wait-for-it: www.google.com:80 is available after 0 seconds
 $ echo $?
 0
-$ ./wait-for-it.sh www.google.com:81
-wait-for-it.php: waiting 15 seconds for www.google.com:81
-wait-for-it.php: timeout occurred after waiting 15 seconds for www.google.com:81
+$ vendor/bin/wait-for-it www.google.com:81
+wait-for-it: waiting 15 seconds for www.google.com:81
+wait-for-it: timeout occurred after waiting 15 seconds for www.google.com:81
 $ echo $?
 124
 ```
-
-## Community
-
-*Debian*: There is a [Debian package](https://tracker.debian.org/pkg/wait-for-it).
