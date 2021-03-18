@@ -133,11 +133,18 @@ function wait_for_it_exec(string $path, array $arguments)
     $realpath = realpath($path);
 
     if (! $realpath) {
-        $realpath = realpath(shell_exec('which ' . escapeshellarg($path)));
+        $whichPath = shell_exec('which ' . escapeshellarg($path));
+        if ($whichPath) {
+            $realpath = realpath($whichPath);
+        }
     }
 
     if (! $realpath) {
-        $realpath = realpath(shell_exec('which sh'));
+        $whichPath = shell_exec('which sh');
+        if ($whichPath) {
+            $realpath = realpath($whichPath);
+        }
+
         if (! $realpath) {
             $realpath = '/bin/sh';
         }
