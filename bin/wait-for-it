@@ -203,7 +203,7 @@ USAGE;
 /**
  * Waits for the given $address to become available, or until $timeout seconds go by, whichever comes first.
  *
- * @param  string  $address          Host address to try and connect to. In the standard URL format
+ * @param  string      $address      Host address to try and connect to. In the standard URL format
  *                                   `transport://target`. So in reality this can be any PHP stream.
  * @param  int         $timeout      Number of seconds to wait for the host to become available.
  * @param  float|null  $time_waited  If set, will be filled with time waited for the host to become available.
@@ -213,22 +213,30 @@ function wait_for_it(string $address, int $timeout = 15, float &$time_waited = n
 {
     $start = microtime(true);
 
+    $interval_time_sec = 1;
     $client = null;
     do {
+        $wait_start = microtime(true);
+
         try {
             /** @noinspection PhpUsageOfSilenceOperatorInspection */
-            $client = @stream_socket_client($address, $errno, $errstr, 1, STREAM_CLIENT_CONNECT);
+            $client = @stream_socket_client($address, $errno, $errstr, $interval_time_sec, STREAM_CLIENT_CONNECT);
         } catch (Throwable $t) {
             // Ignore.
         }
 
         $time_waited = round(microtime(true) - $start, 3);
-    } while (! $client && (0 === $timeout || $time_waited < $timeout));
 
-    if ($client) {
-        fclose($client);
-        return true;
-    }
+        if ($client) {
+            fclose($client);
+            return true;
+        }
+
+        $interval = microtime(true) - $wait_start;
+        if ($interval < $interval_time_sec) {
+            usleep((int) round(1000000 * ($interval_time_sec - $interval)));
+        }
+    } while (0 === $timeout || $time_waited < $timeout);
 
     return false;
 }
